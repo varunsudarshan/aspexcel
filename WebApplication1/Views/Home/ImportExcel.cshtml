@@ -1,0 +1,282 @@
+﻿@using System.Data;
+@{
+    ViewBag.Title = "ImportExcel";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>ImportExcel</title>
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <script src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function () {
+          $("#Upload").click(function () {
+              i = 0;
+              $('#exceldata').find('tr').each(function (i, el) {
+                  if (i == 0) {
+                      i = 1;
+                  }
+                  else {
+
+                      var $tds = $(this).find('td');
+                                          
+                  /*      data = "{" + "Region:\"" + $tds.eq(0).text() + "\"," +
+                      "Branch:\"" + $tds.eq(1).text() + "\"," +
+                      "segment:\"" + $tds.eq(2).text() + "\"," +
+                      "vin:\"" + $tds.eq(3).text() + "\"," +
+                      "In_date:\"" + $("#weekdate").val() + "\"" +
+                      "Status:\"" + $tds.eq(5).text() + "\"," +
+                      "Reason:\"" + $tds.eq(6).text() + "\"," +
+                      "Contested_amount:\"" + $tds.eq(7).text() + "\"," +
+                      "customer:\"" + $tds.eq(8).text() + "\"," +
+                      "Remarks:\"" + $tds.eq(9).text() + "\"," +
+                      "Dealer:" + $("#dealerid").val() + "," +
+                      "Jobref_no:\"" + $tds.eq(11).text() + "\"," +
+                      "model:\"" + $tds.eq(12).text() + "\"," +
+                      "Repair_type:\"" + $tds.eq(13).text() + "\"," +
+                       "weekdate:\"" + $("#weekdate").val() + "\"" +
+                      "}";*/
+                      var content = '{"Region":'+$tds.eq(0).text()+
+                      ',"Branch":'+$tds.eq(1).text()+
+                      ',"Dealer_id":'+$("#dealerid").val()+
+                      ',"In_date":'+$("#weekdate").val()+
+                      ',"model":'+$tds.eq(12).text()+
+                      ',"vin":'+$tds.eq(3).text()+
+                      ',"Status":'+$tds.eq(5).text()+
+                      ',"Reason":'+$tds.eq(6).text()+
+                      ',"Repair_type":'+$tds.eq(13).text()+
+                      ',"Contested_amount":'+$tds.eq(7).text()+
+                      ',"customer":'+$tds.eq(8).text()+
+                      ',"insurance_company":null,"Remarks":'+$tds.eq(9).text()+
+                      ',"segment":'+$tds.eq(2).text()+
+                      ',"Parts":null'+
+                      ',"D2s_no":null'+
+                      ',"Jobref_no":null'+
+                      ',"weekdate":'+$("#weekdate").val()+
+                      '}'
+                  console.log(content);
+                  console.log("concatenated");
+                      $.ajax({
+                          url: 'http://192.168.3.63:9091/api/vor/',
+                          type: 'POST',
+                          dataType: 'json',
+                          data: content,
+                          success: function (data, textStatus, xhr) {
+                              console.log(data);
+                          },
+                          error: function (xhr, textStatus, errorThrown) {
+                              console.log('Error in Operation');
+                          }
+                      });
+
+
+
+                      // do something with productId, product, Quantity
+                      var saveData = $.ajax({
+                          type: 'POST',
+                          url: "http://192.168.3.63:9091/api/vor",
+                          data: data,
+                          dataType: "json",
+                          success: function (result) {
+                              if (result != null )
+                                  alert("record " + result + " Saved");
+                          },
+
+                      });
+                      saveData.error(function () { alert("Something went wrong" + data); });
+
+                  }
+                  });
+
+              
+               
+            });
+        
+      });
+
+
+    </script>
+
+
+
+</head>
+
+<body>
+
+    <h2>ImportExcel</h2>
+    <!--[if !IE]><!-->
+    <style type="text/css">
+            /* Generic Styling, for Desktops/Laptops */
+            table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            /* Zebra striping */
+            tr:nth-of-type(odd) {
+                background: #eee;
+            }
+
+            th {
+                background: #333;
+                color: white;
+                font-weight: bold;
+            }
+
+            td, th {
+                padding: 6px;
+                border: 1px solid #ccc;
+                text-align: left;
+            }
+            /*
+        Max width before this PARTICULAR table gets nasty
+        This query will take effect for any screen smaller than 760px
+        and also iPads specifically.
+        */
+            @@media only screen and (max-width: 760px), (min-device-width: 768px) and (max-device-width: 1024px) {
+
+                /* Force table to not be like tables anymore */
+                table, thead, tbody, th, td, tr {
+                    display: block;
+                }
+
+                    /* Hide table headers (but not display: none;, for accessibility) */
+                    thead tr {
+                        position: absolute;
+                        top: -9999px;
+                        left: -9999px;
+                    }
+
+                tr {
+                    border: 1px solid #ccc;
+                }
+
+                td {
+                    /* Behave  like a "row" */
+                    border: none;
+                    border-bottom: 1px solid #eee;
+                    position: relative;
+                    padding-left: 50%;
+                }
+
+                    td:before {
+                        /* Now like a table header */
+                        position: absolute;
+                        /* Top/left values mimic padding */
+                        top: 6px;
+                        left: 6px;
+                        width: 45%;
+                        padding-right: 10px;
+                        white-space: nowrap;
+                    }
+
+                    /*
+         Label the data
+         */
+                    td:before {
+                        content: attr(data-title);
+                    }
+            }
+    </style>
+
+    <!--<![endif]-->
+    @using (Html.BeginForm("ImportExcel", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
+
+    {
+        <table>
+            <tr><td>Excel file</td><td><input type="file" id="FileUpload1" name="FileUpload1" /></td> <td></td><td></td></tr>
+            <tr>
+                <td>Date</td>
+                <td><input type="date" id="weekdate" name="weekdate" /></td>
+                <td>Dealer</td>
+                <td><input type="text" id="dealerid" name="dealerid" /></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><input type="submit" id="Submit" name="Verify" value="Verify" /></td>
+             </tr>
+        </table>
+    }
+
+    <div>
+        <table id="exceldata">
+
+            @if (ViewBag.Data != null)
+            {
+                <tr><td><input type="submit" id="Upload" name="Upload" value="Upload" /></td></tr>
+                <tr>
+
+                    @foreach (DataColumn column in (ViewBag.Data as System.Data.DataTable).Columns)
+                {
+
+                    <td>@column.ColumnName.ToUpper()</td>
+
+                    }
+                 </tr>
+
+     
+
+                if ((ViewBag.Data as System.Data.DataTable).Rows.Count > 0)
+                {
+                    foreach (DataRow dr in (ViewBag.Data as System.Data.DataTable).Rows)
+                    {
+
+                        <tr>
+
+                            @foreach (DataColumn column in (ViewBag.Data as System.Data.DataTable).Columns)
+                        {
+                                <td data-title='@column.ColumnName'>
+
+                                    @dr[column].ToString()
+                                </td>
+                            }
+
+
+
+
+                        </tr>
+
+                    }
+
+                }
+                else
+                {
+                    int count = (ViewBag.Data as System.Data.DataTable).Columns.Count;
+                    <tr>
+
+                        <td colspan='@count' style="color:red;">
+
+                            No Data Found.
+                        </td>
+
+
+
+                    </tr>
+
+                }
+
+            }
+            else
+            {
+                if (ViewBag.Error != null)
+                {
+                    <tr>
+                        <td style="color:red;">
+
+                            @(ViewBag.Error != null ? ViewBag.Error.ToString() :"")
+                        </td>
+
+
+
+                    </tr>
+                }
+            }
+        </table>
+    </div>
+</body>
+</html>

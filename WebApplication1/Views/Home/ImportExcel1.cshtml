@@ -1,0 +1,130 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+
+<head>
+      <meta name="viewport" content="width=device-width" />
+    <title>ImportExcel</title>
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <script src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function () {
+          $("#Submit").click(function () {
+
+               var saveData =  $.ajax({
+                type: 'POST',
+                url: "Home1?action=Importexcel",
+                data: data,                                           
+                dataType: "json",
+                contentType: false,
+                success: function (resultData) {
+                    if (resultData != null || resultData != '')
+                        alert("Save Complete");
+                    $("FileUpload1").val('');
+                },
+                      
+            });
+            saveData.error(function () { alert("Something went wrong"); });
+            //alert('Example of a basic alert box in jquery', 'jquery basic alert box');
+        });
+
+    });
+
+    </script> 
+  
+    
+          
+</head>
+
+<body>
+    <h2>ImportExcel</h2>
+    <!--[if !IE]><!-->
+    <style type="text/css">
+        /* Generic Styling, for Desktops/Laptops */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        /* Zebra striping */
+        tr:nth-of-type(odd) {
+            background: #eee;
+        }
+
+        th {
+            background: #333;
+            color: white;
+            font-weight: bold;
+        }
+
+        td, th {
+            padding: 6px;
+            border: 1px solid #ccc;
+            text-align: left;
+        }
+        /*
+          Max width before this PARTICULAR table gets nasty
+          This query will take effect for any screen smaller than 760px
+          and also iPads specifically.
+        */
+        @@media only screen and (max-width: 760px), (min-device-width: 768px) and (max-device-width: 1024px) {
+
+            /* Force table to not be like tables anymore */
+            table, thead, tbody, th, td, tr {
+                display: block;
+            }
+
+                /* Hide table headers (but not display: none;, for accessibility) */
+                thead tr {
+                    position: absolute;
+                    top: -9999px;
+                    left: -9999px;
+                }
+
+            tr {
+                border: 1px solid #ccc;
+            }
+
+            td {
+                /* Behave  like a "row" */
+                border: none;
+                border-bottom: 1px solid #eee;
+                position: relative;
+                padding-left: 50%;
+            }
+
+                td:before {
+                    /* Now like a table header */
+                    position: absolute;
+                    /* Top/left values mimic padding */
+                    top: 6px;
+                    left: 6px;
+                    width: 45%;
+                    padding-right: 10px;
+                    white-space: nowrap;
+                }
+
+                /*
+           Label the data
+           */
+                td:before {
+                    content: attr(data-title);
+                }
+        }
+    </style>
+
+    <div> 
+       
+         <table>
+            <tr><td>Excel file</td><td><input type="file" id="FileUpload1" name="FileUpload1" /></td></tr>
+            <tr><td>Date</td><td><input type="date" id="weekdate" name="weekdate" /></td></tr>
+            <tr><td>Dealer</td><td><input type="text" id="dealerid" name="dealerid" /></td></tr>
+            <tr><td></td><td><input type="submit" id="Submit" name="Submit" value="Submit" /></td></tr>
+        </table>
+    </div>
+</body>
+</html>
