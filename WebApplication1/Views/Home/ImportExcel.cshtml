@@ -14,97 +14,158 @@
     <title>ImportExcel</title>
     <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
     <script src="~/Scripts/jquery-1.10.2.min.js"></script>
-    <script type="text/javascript">
-      $(document).ready(function () {
-          $("#Upload").click(function () {
-              i = 0;
-              $('#exceldata').find('tr').each(function (i, el) {
-                  if (i == 0) {
-                      i = 1;
-                  }
-                  else {
-
-                      var $tds = $(this).find('td');
-                                          
-                  /*      data = "{" + "Region:\"" + $tds.eq(0).text() + "\"," +
-                      "Branch:\"" + $tds.eq(1).text() + "\"," +
-                      "segment:\"" + $tds.eq(2).text() + "\"," +
-                      "vin:\"" + $tds.eq(3).text() + "\"," +
-                      "In_date:\"" + $("#weekdate").val() + "\"" +
-                      "Status:\"" + $tds.eq(5).text() + "\"," +
-                      "Reason:\"" + $tds.eq(6).text() + "\"," +
-                      "Contested_amount:\"" + $tds.eq(7).text() + "\"," +
-                      "customer:\"" + $tds.eq(8).text() + "\"," +
-                      "Remarks:\"" + $tds.eq(9).text() + "\"," +
-                      "Dealer:" + $("#dealerid").val() + "," +
-                      "Jobref_no:\"" + $tds.eq(11).text() + "\"," +
-                      "model:\"" + $tds.eq(12).text() + "\"," +
-                      "Repair_type:\"" + $tds.eq(13).text() + "\"," +
-                       "weekdate:\"" + $("#weekdate").val() + "\"" +
-                      "}";*/
-                      var content = '{"Region":'+$tds.eq(0).text()+
-                      ',"Branch":'+$tds.eq(1).text()+
-                      ',"Dealer_id":'+$("#dealerid").val()+
-                      ',"In_date":'+$("#weekdate").val()+
-                      ',"model":'+$tds.eq(12).text()+
-                      ',"vin":'+$tds.eq(3).text()+
-                      ',"Status":'+$tds.eq(5).text()+
-                      ',"Reason":'+$tds.eq(6).text()+
-                      ',"Repair_type":'+$tds.eq(13).text()+
-                      ',"Contested_amount":'+$tds.eq(7).text()+
-                      ',"customer":'+$tds.eq(8).text()+
-                      ',"insurance_company":null,"Remarks":'+$tds.eq(9).text()+
-                      ',"segment":'+$tds.eq(2).text()+
-                      ',"Parts":null'+
-                      ',"D2s_no":null'+
-                      ',"Jobref_no":null'+
-                      ',"weekdate":'+$("#weekdate").val()+
-                      '}'
-                  console.log(content);
-                  console.log("concatenated");
-                      $.ajax({
-                          url: 'http://192.168.3.63:9091/api/vor/',
-                          type: 'POST',
-                          dataType: 'json',
-                          data: content,
-                          success: function (data, textStatus, xhr) {
-                              console.log(data);
-                          },
-                          error: function (xhr, textStatus, errorThrown) {
-                              console.log('Error in Operation');
-                          }
-                      });
-
-
-
-                      // do something with productId, product, Quantity
-                      var saveData = $.ajax({
-                          type: 'POST',
-                          url: "http://192.168.3.63:9091/api/vor",
-                          data: data,
-                          dataType: "json",
-                          success: function (result) {
-                              if (result != null )
-                                  alert("record " + result + " Saved");
-                          },
-
-                      });
-                      saveData.error(function () { alert("Something went wrong" + data); });
-
-                  }
-                  });
-
-              
-               
-            });
+    <script type="text/javascript"> 
         
-      });
+        function showall() {
+            $("#dealeridtd").show();
+            $("#dealertxt").show();
+            $("#nm1").show();
+            $("#nm2").show();
+            $("#datepickertxt").show();
+            $("#datepicker").show();
+        }
+
+        function change() {
+            var str = $('#weekdate').val().split("-")
+            var date = new Date(str[0], str[1] - 1, str[2]);
+            
+            console.log(date)
+            if (date.getDay() == 1) {
+               
+                $("#Upload").show()
+                $("#upbtnholder").show()
+                
+            }
+            else {
+                $("#Upload").hide()
+                $("#upbtnholder").hide()
+                alert("please choose a monday")
+            }
+        }
+
+        function getWeekNumber(d) {
+            // Copy date so don't modify original
+            d = new Date(+d);
+            console.log(d)
+            d.setHours(0, 0, 0, 0);
+            // Set to nearest Thursday: current date + 4 - current day number
+            // Make Sunday's day number 7
+            d.setDate(d.getDate() + 4 - (d.getDay() || 7));
+            // Get first day of year
+            var yearStart = new Date(d.getFullYear(), 0, 1);
+            // Calculate full weeks to nearest Thursday
+            var weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+            // Return array of year and week number
+            return  weekNo;
+        }
+
+        $(document).ready(function () {
+
+                if ($('#exceldata tr:nth-child(1)').text()) {
+                    showall()
+                }
+                
+                url = 'http://192.168.3.63:9091/api/dealers/'
+
+                    $.get(url, function (jd) {
+                        for (i = 0; i < jd.length; i++) {
+                            $('#json-datalist').append('<option value="'  + jd[i].Dealer_ID + '">'+jd[i].Dealer_Name+'</option>');
+                        }
+                    });
+                
+                console.log($('#weekdate').val());
+                $("#Upload").click(function () {
+                    var err = 0;
+                    var hist;
+                    $('#exceldata tbody').find('tr').each(function (i, el) {
 
 
+                        var $tds = $(this).find('td');
+                        var today = new Date()
+                        var date = $tds.eq(4).text().trim().split("/")
+
+                        var weekdateobj = new Date($("#weekdate").val().split('-')[0], $("#weekdate").val().split('-')[1]-1, $("#weekdate").val().split('-')[2])
+                        console.log(weekdateobj)
+                        var datestr = date[2].split(" ")[0] + "-" + date[0] + "-" + date[1]
+                        
+                        var selected = $('#json-datalist').find('option:selected');
+                        var content = '{"Region":"' + $tds.eq(0).text().trim() +
+                        '","Branch":"' + $tds.eq(1).text().trim() +
+                        '","Dealer_id":' + selected.val() +
+                        ',"In_date":"' + datestr +
+                        '","model":"' + $tds.eq(12).text().trim() +
+                        '","vin":"' + $tds.eq(3).text().trim() +
+                        '","Status":"' + $tds.eq(5).text().trim() +
+                        '","Reason":"' + $tds.eq(6).text().trim() +
+                        '","Repair_type":"' + $tds.eq(13).text().trim() +
+                        '","Contested_amount":"' + $tds.eq(7).text().trim() +
+                        '","customer":"' + $tds.eq(8).text().trim() +
+                        '","insurance_company":null,"Remarks":"' + $tds.eq(9).text().trim() +
+                        '","segment":"' + $tds.eq(2).text().trim() +
+                        '","Parts":null' +
+                        ',"D2s_no":null' +
+                        ',"Jobref_no":"' + $tds.eq(11).text().trim() +
+                        '","weekdate":"' + $("#weekdate").val() + "T00:00:00" +
+                        '"}'
+                        
+                        console.log(content);
+                        
+                        hist = "{"+
+                            '"Status_week_date":"'+ $("#weekdate").val() + 'T00:00:00",'+
+                            '"Year": '+parseInt(date[2].split(" ")[0])+','+
+                            '"week":'+ getWeekNumber(weekdateobj)+','+
+                            '"Dealer_ID":'+ selected.val()+','+
+                            '"upload_date":"' + today.getFullYear() + '-' + today.getMonth() + '-' + today.getDate() + '",' +
+                            '"uploaded_by":'+ 1+','+
+                            '"Branch":"' + $tds.eq(1).text().trim()+
+                        '"}'
+                        console.log(hist);
+
+                        $.ajax({
+                            url: 'http://192.168.3.63:9091/api/vor',
+                            type: 'POST',
+                            async: false,
+                            //dataType: 'json',
+                            contentType: 'application/json',
+                            data: content,
+                            success: function (data, textStatus, xhr) {
+                                console.log("Succesfully Uploaded")
+                            },
+                            error: function (xhr, textStatus, errorThrown) {
+                                err = 1
+                                console.log('Error in Operation');
+                                $('#exceldata tbody > tr:nth-child(' + (i+1) + ')').css('background-color', '#FF0000')
+
+                            }
+                        });
+
+
+
+                        
+                        
+                    });
+                    $.ajax({
+                        url: 'http://192.168.3.63:9091/api/history',
+                        type: 'POST',
+                        async: false,
+                        //dataType: 'json',
+                        contentType: 'application/json',
+                        data: hist,
+                        success: function (data, textStatus, xhr) {
+                        },
+                        error: function (xhr, textStatus, errorThrown) {
+
+                            console.log('Error in Operation history');
+
+                        }
+                    });
+                    if (!err) {
+                        alert("success")
+                    }
+                });
+
+            });
     </script>
-
-
-
 </head>
 
 <body>
@@ -132,6 +193,9 @@
                 padding: 6px;
                 border: 1px solid #ccc;
                 text-align: left;
+            }
+            #dealeridtd,#dealertxt,#nm1,#nm2,#datepickertxt,#datepicker,#Upload,#upbtnholder{
+                display: none;
             }
             /*
         Max width before this PARTICULAR table gets nasty
@@ -189,35 +253,45 @@
 
     {
         <table>
-            <tr><td>Excel file</td><td><input type="file" id="FileUpload1" name="FileUpload1" /></td> <td></td><td></td></tr>
+            <tr><td>Excel file</td><td><input type="file" id="FileUpload1" name="FileUpload1" /></td> <td id="nm1"></td><td id="nm2"></td></tr>
             <tr>
-                <td>Date</td>
-                <td><input type="date" id="weekdate" name="weekdate" /></td>
-                <td>Dealer</td>
-                <td><input type="text" id="dealerid" name="dealerid" /></td>
+                <td id="datepickertxt">Date(Monday Only)</td>
+                <td id="datepicker"><input type="date" id="weekdate" onchange="change(id)" name="weekdate" /></td>
+                <td id="dealertxt">Dealer</td>
+                <td id="dealeridtd"><!--<input type="text"  list="json-datalist" placeholder="e.g. datalist" id="dealerid" name="dealerid" />-->
+                
+                <select id="json-datalist">
+
+                </select>
+                
+                </td>
             </tr>
             <tr>
                 <td></td>
-                <td><input type="submit" id="Submit" name="Verify" value="Verify" /></td>
+                <td><input type="submit" id="Submit" name="Verify" value="import" /></td>
              </tr>
         </table>
+        <datalist id="jsona-datalist"></datalist>
     }
 
     <div>
+        <input type="submit" id="Upload" name="Upload" value="Upload" />
         <table id="exceldata">
 
             @if (ViewBag.Data != null)
             {
-                <tr><td><input type="submit" id="Upload" name="Upload" value="Upload" /></td></tr>
-                <tr>
-
-                    @foreach (DataColumn column in (ViewBag.Data as System.Data.DataTable).Columns)
+                <thead>
+                    <!--<tr id="upbtnholder"><td><input type="submit" id="Upload" name="Upload" value="Upload" /></td></tr>-->
+                    <tr>
+                        @foreach (DataColumn column in (ViewBag.Data as System.Data.DataTable).Columns)
                 {
 
-                    <td>@column.ColumnName.ToUpper()</td>
+                            <td>@column.ColumnName.ToUpper()</td>
 
-                    }
-                 </tr>
+
+                        }
+                    </tr>
+                 </thead>
 
      
 

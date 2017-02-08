@@ -1,14 +1,14 @@
 ﻿
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.OleDb;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using System.IO;
-using System.Data;
-using System.Data.OleDb;
-using WebApplication1.Models;
 using WebApplication1.Common;
+using WebApplication1.Models;
 
 namespace WebApplication1.Controllers
 {
@@ -17,8 +17,7 @@ namespace WebApplication1.Controllers
         // GET: Home1
         public ActionResult ImportExcel()
         {
-
-
+            
             return View();
         }
         [ActionName("Importexcel")]
@@ -37,8 +36,10 @@ namespace WebApplication1.Controllers
 
 
                 string[] validFileTypes = { ".xls", ".xlsx", ".csv" };
+                string dir = Server.MapPath("~/Content/Uploads");
+                string fname = Request.Files["FileUpload1"].FileName;
+                string path1 = string.Format("{0}\\{1}",dir , fname);
 
-                string path1 = string.Format("{0}/{1}", Server.MapPath("~/Content/Uploads"), Request.Files["FileUpload1"].FileName);
                 if (!Directory.Exists(path1))
                 {
                     Directory.CreateDirectory(Server.MapPath("~/Content/Uploads"));
@@ -62,7 +63,7 @@ namespace WebApplication1.Controllers
                     }
                     else if (extension.Trim() == ".xlsx")
                     {
-                        connString = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + path1 + ";Extended Properties=\"Excel 12.0;HDR=Yes;IMEX=2\"";
+                        connString = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + path1 + ";Extended Properties=\"Excel 12.0 Xml;HDR=Yes;IMEX=2\"";
                         DataTable dt = Utility.ConvertXSLXtoDataTable(path1, connString);
                         ViewBag.Data = dt;
                     }
